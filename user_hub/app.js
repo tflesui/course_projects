@@ -1,14 +1,6 @@
 // API URL
 const BASE_URL = 'https://jsonplace-univclone.herokuapp.com';
 
-
-
-
-
-fetchUsers().then( data => {
-    console.log(data);
-})
-
     // Functions to display user data
 // Build the user element
 const renderUser = user => {
@@ -33,7 +25,6 @@ const renderUser = user => {
     return element;
 }
 
-
 // Display each element on the page
 const renderUserList = userList => {
     $('#user-list').empty();
@@ -45,18 +36,15 @@ const renderUserList = userList => {
 }
 
     // Functions to load and show user albums
-
-
 // Render a single album
 const renderAlbum = album => {
     console.log(album);
     const element = $(`<div class="album-card">
-                <header>
-                    <h3>${album.title}, by ${album.user.name} </h3>
-                </header>
-                <section class="photo-list">
-                </section>
-            </div>`);
+                        <header>
+                            <h3>${album.title}, by ${album.user.name} </h3>
+                        </header>
+                        <section class="photo-list"></section>
+                    </div>`);
     
     const photoList = element.find('.photo-list');
     
@@ -71,7 +59,7 @@ const renderAlbum = album => {
 // Render a single photo
 const renderPhoto = photo => {
     return $(`<div class="photo-card">
-    <a href="${photo.url}">
+    <a href="${photo.url}" target="_blank">
       <img src="${photo.thumbnailUrl}">
       <figure>${photo.title}</figure>
     </a>
@@ -84,7 +72,8 @@ function renderAlbumList(albumList){
     $('#album-list').empty().addClass('active');
 
     albumList.forEach( album => {
-        $('#album-list').append( renderAlbum (album) );
+        const albumElement = renderAlbum(album)
+        $('#album-list').append(albumElement);
     });
 }
 
@@ -115,34 +104,27 @@ const bootstrap = () => {
     });
 }
 
-// fetchUserAlbumList(2).then(function (albumList) {
-//     console.log(albumList);
-//   }); 
-
 // Click listeners
 $('#user-list').on('click', '.user-card .load-posts', function() {
-    const userCard = $(this).closest('.user-card').data('user');
-    console.log(userCard);
     // Load posts for this user
-    
+    const userCard = $(this).closest('.user-card').data('user');
+    console.log(userCard.username);
     // Render posts for this user
 
 });
 
 
 $('#user-list').on('click', '.user-card .load-albums', function() {
+        // Load albums for this user
     const userCard = $(this).closest('.user-card').data('user');
-    console.log(userCard);
     fetchUserAlbumList(userCard.id).then( albumList => {
         renderAlbumList(albumList);
     });
-    // Load albums for this user
+
 
     // Render albums for this user
 
 });
-
-
 
 bootstrap();
 
