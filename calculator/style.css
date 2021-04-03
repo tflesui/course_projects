@@ -1,0 +1,128 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+  
+  html {
+    font-size: 24px;
+    font-family: 'Unica One', cursive;
+  }
+  
+  #app {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 1rem 0;
+  }
+  
+  #app h1 {
+    font-size: 3rem;
+    letter-spacing: 0.5rem;
+    margin-bottom: 8px;
+  }
+
+  button:focus {
+    outline: none;
+  }
+
+  /* Layout */
+  .calculator {
+    display: grid;
+    grid-template-rows: 160px 1fr;
+    border: 1px solid black;
+    border-radius: 10px;
+    width: 450px;
+    height: 700px;
+    padding: 30px;
+    grid-gap: .5em;
+    background-color: teal;
+  }
+
+  .display {
+    display: grid;
+    grid-row: 1;
+    grid-template-rows: repeat(4, 40px);
+    grid-template-columns: repeat(2, 1fr);
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: .2em;
+    box-shadow: -2px -2px 3px 2px black inset;
+    background-color: rgb(139, 172, 241);
+  }
+
+  .controls {
+    display: grid;
+    grid-row: 2;
+    gap: .5em;
+    border-radius: 10px;
+    grid-template-rows: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    padding: .25em;
+  } 
+
+  .controls button {
+    border-radius: 10px;
+    font-size: .75em;
+    box-shadow: 2px 2px 3px black;
+  }
+
+  .memory {
+    display: grid;
+    grid-column: 1 / 4;
+    grid-row: 2;
+    grid-template-columns: 40% 1fr;
+    gap: .5em; 
+  }
+
+  .memory button {
+    background-color: rgb(235, 235, 76);
+  }
+
+  .digits {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-column: 1 / 4;
+    grid-row: 3 / 7;
+    gap: .5em;
+  }
+
+  .digits button {
+    background-color: lightgray;
+  }
+
+  .operations {
+    display: grid;
+    grid-column: 4 / 5;
+    grid-row: 2 / 7;
+    gap: .5em;
+    font-size: 1.5em;
+  }
+
+  .extended {
+    display:grid;
+    grid-column: 1/ 5;
+    grid-row: 1;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: .5em;
+  }
+
+  .extended button {
+    background-color: rgb(235, 186, 80);
+  }
+
+  .operations button {
+    background-color: rgb(235, 186, 80);
+  }
+
+  .operations button:last-of-type {
+    background-color: rgb(233, 74, 74);
+  }
+
+  .digits :last-of-type {
+    grid-column: 2 / 4;
+  }

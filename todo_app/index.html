@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <!-- fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Tomorrow|Noto+Sans&display=swap" rel="stylesheet">
+    <!-- jQuery and jQuery-ui -->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <!-- our hard work below -->
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <span>TODO.APP</span>
+      </header>
+      <aside class="left-drawer">
+        <button class="action add-todo">
+          <i class="material-icons">add_circle</i>
+          <span class="action-text">Create New Todo</span>
+        </button>
+        <button class="action remove-completed">
+          <i class="material-icons">check_circle</i>
+          <span class="action-text">Remove Completed Todos</span>
+        </button>
+        <button class="action remove-expired">
+          <i class="material-icons">delete_sweep</i>
+          <span class="action-text">Remove Expired Todos</span>
+        </button>
+      </aside>
+      <main>
+        <section class="todo-list">
+          <h3 class="list-title">Pending Todos</h3>
+          <div class="content pending-todos"></div>
+        </section>
+        <section class="todo-list">
+          <h3 class="list-title">Completed Todos</h3>
+          <div class="content completed-todos"></div>
+        </section>
+        <section class="todo-list">    
+          <h3 class="list-title">Expired Todos</h3>
+          <div class="content expired-todos"></div>
+        </section>
+      </main>
+      <div class="modal">
+        <div class="content">
+          <h3>Create New Todo</h3>
+          <form class="todo-form" action="" method="">
+            <label for="todo-title">Todo Title</label>
+            <input type="text" id="todo-title" required>
+            <h5>This is a required field</h5>
+            <label for="todo-due-date">Due Date</label>
+            <input type="date" id="todo-due-date" required>
+            <h5>This is a required field</h5>
+            <label for="todo-description">Description</label>
+            <textarea id="todo-description" columns="40" rows="5"></textarea>
+            <div class="actions">
+              <button class="action create-todo when-valid">
+                <i class="material-icons">add_circle</i>
+                <span class="action-text">Create</span>
+              </button>
+              <button disabled class="action create-todo when-invalid">
+                <i class="material-icons">add_circle</i>
+                <span class="action-text">Create</span>
+              </button>
+              <button class="action cancel-create-todo">
+                <i class="material-icons">cancel</i>
+                <span class="action-text">Cancel</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

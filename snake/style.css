@@ -1,0 +1,131 @@
+/* Browser Reset */
+* {
+    padding: 0;
+    margin: 0;
+    border: none;
+    box-sizing: border-box;
+}
+
+body {
+    display: grid;
+    grid-template-rows: 1fr minmax(400px, 1fr) 1fr;
+    grid-template-columns: 1fr minmax(400px, 1fr) 1fr;
+    height: 100vh;
+    width: 100vw;
+
+    font-family: 'Oxygen', sans-serif;
+    background: #799F0C;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to top, #ACBB78, #799F0C);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to top, #ACBB78, #799F0C); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+header {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: center;
+    align-self: center;
+    padding-top: 20px;
+}
+
+.title {
+    font-family: 'Ranchers', cursive;
+    font-size: 4em;
+    letter-spacing: .1em;
+    padding-bottom: .5em;
+}
+
+.message {
+    font-family: 'Ranchers';
+    font-size: 2em;
+    color: darkred;
+    text-align: center;
+}
+
+section {
+    display: grid;
+    grid-row: 2;
+}
+
+.instructions {    
+    justify-self: end;
+    padding: 20px;
+    line-height: 2em;
+}
+
+.instructions > ul {
+    margin-top: 1em;
+}
+
+.info {
+    padding: 20px;
+    line-height: 2em;
+    margin-left: 3em;
+}
+
+.info > h2:last-of-type {
+    margin-left: 1em;
+}
+
+#hi-score {
+    margin-left: 1.25em;
+    margin-bottom: 1.25em;
+    font-weight: 700;
+    font-size: 2em;
+    padding-top: .5em;
+}
+
+#score {
+    margin-left: 1.25em;
+    font-weight: 700;
+    font-size: 2em;
+    padding-top: .5em;
+}
+
+
+main {
+    grid-row: 2;
+}
+
+#canvas {
+    height: 400px;
+    width: 400px;
+    margin: auto;
+    border: 4px solid rgb(126, 68, 41);
+    border-radius: 4px;
+    background-color: gray;
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+}
+
+footer {
+    grid-row: 3;
+    grid-column: 2;
+    display: grid;
+}
+
+.gameplay {
+    justify-self: center;
+}
+
+.gameplay button {
+    height: 50px;
+    width: 100px;
+    justify-content: space-around;
+    background-color: gray;
+    color: greenyellow;
+    font-family: 'Ranchers', cursive;
+    border-radius: 5px;
+    border: 1px solid rgb(126, 68, 41);
+    margin: 1.5em;
+}
+
+.apple {
+    background-color: red;
+    border-radius: 50%;
+}
+
+.snake {
+    background-color: green;
+    border-radius: 50%;
+}

@@ -1,0 +1,96 @@
+/* Browser reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Page positioning */
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #eee;
+  }
+  
+  /* Header styling */
+  header {
+    font-size: 64px;
+    letter-spacing: 32px;
+    font-family: sans-serif;
+    border-bottom: 1px solid white;
+    margin-bottom: 64px;
+  }
+  
+  /* Main content positioning */
+  main {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  /* Input positioning */
+  .input {
+    display: flex;
+    flex-basis: 100vw;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2em;
+  }
+  
+  /* Color palette positioning */
+  .palette, .controls {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .palette button {
+    margin-right: 4px;
+  }
+  
+  /* Button styling */
+  .palette button,
+  .controls button {
+    cursor: pointer;
+    flex: 0 0 64px;
+    width: 64px;
+    border: 1px solid black;
+    margin-bottom: 4px;
+  }
+  
+  .palette button {
+    transition: all .3s ease;
+  }
+  
+  .palette button.active {
+    border: 4px solid gold;
+    transform: scale(1.3) rotate(45deg);
+  }
+  
+  /* Game setup */
+  .grid {
+    width: 514px;
+    height: 514px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0 48px;
+    border: 1px solid black;
+    background: #ccc;
+  }
+  
+  .cell {
+    flex: 0 0 64px;
+    height: 64px;
+    border: 1px solid black;
+  }
+  
+  .controls button {
+    background: white;
+    font-family: sans-serif;
+    font-weight: bold;
+    padding: 4px;
+  }
