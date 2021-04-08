@@ -5,6 +5,8 @@ const KEY = 'apikey=bfecebdd-6f7a-4c42-9173-4dcdb3905af1';
 const fetchObjects = async () => {
     const url = `${ BASE_URL }/object?${ KEY }`;
 
+    onFetchStart();
+
     try {
         const response = await fetch(url);
         const data = await response.json();
@@ -12,6 +14,8 @@ const fetchObjects = async () => {
         return data;
     } catch (error) {
         console.error(error);
+    } finally {
+        onFetchEnd();
     }
 }
 
@@ -25,6 +29,8 @@ const fetchAllCenturies = async () => {
         return JSON.parse(localStorage.getItem('centuries'));
     }
 
+    onFetchStart();
+
     try {
         const response = await fetch(url);
         const data = await response.json();
@@ -35,6 +41,8 @@ const fetchAllCenturies = async () => {
         return records;
     } catch (error) {
         console.error(error);
+    } finally {
+        onFetchEnd();
     }
 }
 
@@ -46,6 +54,8 @@ const fetchAllClassifications = async () => {
         return JSON.parse(localStorage.getItem('classifications'));
     }
 
+    onFetchStart();
+
     try {
         const response = await fetch(url);
         const data = await response.json();
@@ -56,6 +66,8 @@ const fetchAllClassifications = async () => {
         return records;
     } catch (error) {
         console.error(error);
+    } finally {
+        onFetchEnd();
     }
 }
 
@@ -110,12 +122,25 @@ const buildSearchString = () => {
 $('#search').on('submit', async event => {
     event.preventDefault();
 
+    onFetchStart();
+
     try {
         const response = await fetch(buildSearchString());
         const data = await response.json();
 
-        console.log(data.records);
+        console.log(data);
     } catch (error) {
         console.error(error);
+    } finally {
+        onFetchEnd();
     }
 });
+
+// Searching modal
+const onFetchStart = () => {
+    $('#loading').addClass('active');
+}
+
+const onFetchEnd = () => {
+    $('#loading').removeClass('active');
+}
