@@ -128,7 +128,11 @@ $('#search').on('submit', async event => {
         const response = await fetch(buildSearchString());
         const data = await response.json();
 
-        console.log(data);
+        const {records, info} = data;
+
+        console.log(records);
+        console.log(info);
+        updatePreview(records, info);
     } catch (error) {
         console.error(error);
     } finally {
@@ -144,3 +148,62 @@ const onFetchStart = () => {
 const onFetchEnd = () => {
     $('#loading').removeClass('active');
 }
+
+        //Populating the browser
+// Render results into the preview element
+const renderPreview = ({description, primaryimageurl, title}) => {
+    const record = {};
+    // build element and attach object to it
+    const element = $(`
+        <div class="object-preview">
+            <a href="#">
+                ${primaryimageurl ? `<img src="${primaryimageurl}" />` : '' }
+                ${title ? `<h3>${title}</h3>` : ''}
+                ${description ? `<h3>${description}</h3>` : ''}
+            </a>
+        </div>`).data('record', record);
+
+    return element;
+} 
+
+const updatePreview = (records, info) => {
+    const root = $('#preview');
+
+    $('.results').empty();
+
+    if (info.next) {
+        $('.next').data('url', info.next).attr('disabled', false);
+    } else {
+        $('.next').data('url', null).attr('disabled', true);
+    };
+
+    if (info.prev) {
+        $('.previous').data('url', info.prev).attr('disabled', false);
+    } else {
+        $('.previous').data('url', null).attr('disabled', true);
+    };
+
+    records.forEach( record => {
+        $('.results').append(renderPreview(record));
+    });
+
+}
+
+// Pagination listener
+$('#preview .next, #preview .previous').on('click', async function () {
+    
+    onFetchStart();
+
+    try {
+        const url = $(this).data('url');
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const {records, info} = data;
+        updatePreview(records, info);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        onFetchEnd();
+    }
+});
