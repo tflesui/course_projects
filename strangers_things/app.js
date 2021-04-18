@@ -3,12 +3,17 @@ const BASE_URL = 'https://strangers-things.herokuapp.com/api/2102-CPU-RM-WEB-PT'
 
 // Grab posts from API
 const fetchPosts = async () => {
+    const token = localStorage.getItem('token');
     try {
-        const response = await fetch(`${BASE_URL}/posts`);
+        const response = await fetch(`${BASE_URL}/posts`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${JSON.parse(token)}`
+            }
+        });
         const {data} = await response.json();
         const {posts} = data;
     
-        console.log(posts);
         return  renderPosts(posts);
     } catch (error) {
         console.error(error)
@@ -18,24 +23,29 @@ const fetchPosts = async () => {
 // Render all posts on page
 const renderPosts = (posts) => {
     posts.forEach( post => {
-        console.log(post);
         const postElement = createPostHTML(post);
         $('#postsContainer').append(postElement);
     });
 }
 
 const createPostHTML = post => {
-    const {title, description, price} = post;
+    const token = localStorage.getItem('token');
+    const {title, description, price, isAuthor} = post;
     const postElement = `<div class="card m-1" style="width: 18rem;" >
                 <div class="card-body">
                     <h5 class="card-title">${title}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">Price: ${price}</h6>
                     <p class="card-text">${description}</p>
-                    <div class="card-body">
-                        <a href="#" class="card-link">Message</a>
-                        <a href="#" class="card-link">Edit</a>
-                        <a href="#" class="card-link">Delete</a>
-                    </div>
+                    ${ token 
+                        ? `<div class="card-body">
+                            ${ !isAuthor ? `<a href="#" class="card-link btn btn-primary btn-sm" role="button">Message</a>` : '' }
+                            ${ isAuthor 
+                                ? `<a href="#" class="card-link btn btn-secondary btn-sm" role="button">Edit</a>
+                                <a href="#" class="card-link btn btn-danger btn-sm" role="button">Delete</a>` 
+                                : '' }
+                        </div>`
+                        : ''
+                    }
                 </div>
             </div>
     `
@@ -110,6 +120,9 @@ const loginUser = async (usernameValue, passwordValue) => {
         $('#registerNav').css('display', 'none');    
         // Change Login link to Logout
         $('#loginNav').css('display', 'none');
+        $('body').removeClass('modal-open');
+        $('#postsContainer').empty();
+        showHomePage();
     } catch (error) {
         console.error(error);
     }
@@ -147,14 +160,14 @@ const showMyAccount = async () => {
         const data = await response.json();
         const {data: {username}} = data;
         const accountPage = `
-                    <h2>Welcome, ${username}</h2>
+                    <h2>Welcome, ${username}!</h2>
                     <div class="card">
                         <div class="card-header">
-                            Create A New Post
+                            Something to sell?
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title">Create Post</h5>
-                            <p class="card-text">Enter details to create a new listing.</p>
+                            <h5 class="card-title">Create Listing</h5>
+                            <p class="card-text">Hit Start to create a new listing.</p>
                             <a  class="btn btn-primary" role="button" data-bs-toggle="offcanvas" href="#listingEntry" aria-controls="listingEntry">Start</a>
                         </div>
                     </div>
@@ -208,7 +221,6 @@ const showMyAccount = async () => {
             $('#postsContainer').empty();
             $('#myAccountContainer').empty();
             $('#myAccountContainer').append(accountPage);
-            console.log(token);
         } else {
             $('#myAccountNav').addClass('disabled');
             $('#logoutNav').css('display', 'none');
@@ -218,7 +230,7 @@ const showMyAccount = async () => {
     }
 
     $('form').on('submit', e => {
-        e.preventDefault();
+        // e.preventDefault();
 
         const listingTitle = $('#listing-title').val();
         const listingDesc = $('#listing-description').val();
@@ -264,7 +276,6 @@ const postListing = async (listingBody) => {
 
 const showHomePage = () => {
     const token = localStorage.getItem('token');
-
 
     if(token) {
         $('#registerNav').css('display', 'none');
@@ -313,7 +324,6 @@ const logoutUser = () => {
 }
 
 $('#logoutNav').on('click', () => {
-    console.log('clicked');
     logoutUser();
     showHomePage();
 })
@@ -323,6 +333,7 @@ $('#myAccountNav').on('click', () => {
 });
 
 $('#homePageNav').on('click', () => {
+    $('#postsContainer').empty();
     showHomePage();
 });
 
