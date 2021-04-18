@@ -21,16 +21,18 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-link active" aria-current="page" href="#">Home</a>
-                <a class="nav-link" href="#">My Account</a>
-                <a class="nav-link" href="#registerModal" data-bs-toggle="modal">Sign Up</a>
-                <a class="nav-link" href="#loginModal" data-bs-toggle="modal">Login</a>
+                <a class="nav-link active" id="homePageNav" aria-current="page" href="#">Home</a>
+                <a class="nav-link disabled" id="myAccountNav" href="#">My Account</a>
+                <a class="nav-link" id="registerNav" href="#registerModal" data-bs-toggle="modal">Sign Up</a>
+                <a class="nav-link" id="loginNav" href="#loginModal" data-bs-toggle="modal">Login</a>
+                <a class="nav-link" id="logoutNav" href="#">Logout</a>
             </div>
             </div>
         </div>
     </nav>
-    <div class="container">
-        <div id="posts" class="row justify-content-center row-cols-1 row-cols-sm-2 row-cols-md-3 m-3"></div>
+    <div class="container mt-3">
+        <div id="postsContainer" class="row justify-content-center row-cols-1 row-cols-sm-2 row-cols-md-3 m-3"></div>
+        <div id="myAccountContainer"></div>
     </div>
     <div class="modal fade" id="registerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -49,6 +51,7 @@
                             id="registerInputUsername"
                             aria-describedby="usernameHelp"
                             placeholder="Enter username"
+                            required
                         />
                     </div>
                     <div class="form-group mb-2">
@@ -58,6 +61,7 @@
                             class="form-control"
                             id="registerInputPassword"
                             placeholder="Password"
+                            required
                         />
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -87,6 +91,7 @@
                             id="loginInputUsername"
                             aria-describedby="usernameHelp"
                             placeholder="Enter username"
+                            required
                         />
                     </div>
                     <div class="form-group mb-2">
@@ -96,6 +101,7 @@
                             class="form-control"
                             id="loginInputPassword"
                             placeholder="Password"
+                            required
                         />
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
