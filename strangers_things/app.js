@@ -53,6 +53,27 @@ const createPostHTML = post => {
     return postElement;
 }
 
+// Template for reading messages on Account page
+const createMessageHTML = message => {
+    const {content, post, createdAt} = message;
+
+    const messageElement = `<div class="card text-center">
+                                <div class="card-header">
+                                    Message for listing: ${post}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Special title treatment</h5>
+                                    <p class="card-text">${content}</p>
+                                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                                </div>
+                                <div class="card-footer text-muted">
+                                    ${createdAt}
+                                </div>
+                            </div>`
+
+    return messageElement;
+}
+
 // Sign Up functionality
 const registerUser = async (username, password) => {
     const url = `${BASE_URL}/users/register`;
@@ -230,7 +251,7 @@ const showMyAccount = async () => {
     }
 
     $('form').on('submit', e => {
-        // e.preventDefault();
+        e.preventDefault();
 
         const listingTitle = $('#listing-title').val();
         const listingDesc = $('#listing-description').val();
@@ -250,7 +271,7 @@ const showMyAccount = async () => {
         }
         
         postListing(listingBody);
-
+        $('#postsContainer').empty();
         showHomePage();
     });
 }
