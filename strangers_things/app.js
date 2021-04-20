@@ -180,16 +180,35 @@ const showMyAccount = async () => {
         });
         const data = await response.json();
         const {data: {username}} = data;
+        getUserMessages();
         const accountPage = `
-                    <h2>Welcome, ${username}!</h2>
-                    <div class="card">
+                    <h2 class="d-flex justify-content-end">Welcome, ${username}!</h2>
+                    <div class="card mb-3 mt-3">
                         <div class="card-header">
-                            Something to sell?
+                            <h5 class="card-title d-flex justify-content-center">Create Listing</h5>
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title">Create Listing</h5>
+                            <h6>Something to sell?</h6>
                             <p class="card-text">Hit Start to create a new listing.</p>
                             <a  class="btn btn-primary" role="button" data-bs-toggle="offcanvas" href="#listingEntry" aria-controls="listingEntry">Start</a>
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-center">
+                            <h5 class="card-title">Messages</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">See what other users have to say to you</p>
+                            <a  class="btn btn-primary" role="button" data-bs-toggle="modal" href="#messages" aria-controls="messages">Show messages</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title d-flex justify-content-center">My Listings</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">See your posted listings.</p>
+                            <a  class="btn btn-primary" role="button" data-bs-toggle="offcanvas" href="#listingEntry" aria-controls="listingEntry">Show listings</a>
                         </div>
                     </div>
                     <div class="offcanvas offcanvas-start" tabindex="-1" id="listingEntry" aria-labelledby="listingEntryLabel">
@@ -228,6 +247,23 @@ const showMyAccount = async () => {
                                     </div>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="messages" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="messagesLabel">Message</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                 <div class="modal-body">
+                                    <p>messages here</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary">Understood</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -276,6 +312,54 @@ const showMyAccount = async () => {
     });
 }
 
+const getUserMessages = async () => {
+    const {messages} = await getUser();
+
+    return messages;
+    // if(messages){
+    // messageElement = ` 
+    //         <div class="modal fade" id="messages" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    //             <div class="modal-dialog">
+    //                 <div class="modal-content">
+    //                     <div class="modal-header">
+    //                     <h5 class="modal-title" id="messagesLabel">Message</h5>
+    //                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    //                     </div>
+    //                     <div class="modal-body">
+    //                     ${ messages.forEach(message => {
+    //                         `<p>${message}</p>`
+    //                     })}
+    //                     </div>
+    //                     <div class="modal-footer">
+    //                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    //                     <button type="button" class="btn btn-primary">Understood</button>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>
+    // `
+    // } else {
+    //     messageElement = ` 
+    //         <div class="modal fade" id="messages" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    //             <div class="modal-dialog">
+    //                 <div class="modal-content">
+    //                     <div class="modal-header">
+    //                     <h5 class="modal-title" id="messagesLabel">Message</h5>
+    //                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    //                     </div>
+    //                     <div class="modal-body">
+    //                     <p>No messages to display</p>
+    //                     </div>
+    //                     <div class="modal-footer">
+    //                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Done</button>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>
+    // `
+    // }
+}
+
 const postListing = async (listingBody) => {
     const token = localStorage.getItem('token');
     try {
@@ -317,16 +401,19 @@ const showHomePage = () => {
 // Get user data
 const getUser = async () => {
     const TOKEN_STRING = localStorage.getItem('token');
-
+    console.log(TOKEN_STRING);
     try{
         const response = await fetch(`${BASE_URL}/users/me`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${TOKEN_STRING}`
+                "Authorization": `Bearer ${JSON.parse(TOKEN_STRING)}`
             },
         });
         console.log(response);
+        const data = await response.json();
+        console.log(data);
+        return data;
     } catch(err) {
         console.error(err);
     }
