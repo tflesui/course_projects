@@ -28,29 +28,85 @@ const renderPosts = (posts) => {
     });
 }
 
+// Get user data
+const getUser = async () => {
+    const TOKEN_STRING = localStorage.getItem('token');
+    console.log(TOKEN_STRING);
+    try{
+        const response = await fetch(`${BASE_URL}/users/me`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${JSON.parse(TOKEN_STRING)}`
+            },
+        });
+        console.log(response);
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch(err) {
+        console.error(err);
+    }
+
+}
+
 const createPostHTML = post => {
     const token = localStorage.getItem('token');
-    const {title, description, price, isAuthor} = post;
-    const postElement = `<div class="card m-1" style="width: 18rem;" >
+    const {title, description, price, isAuthor, _id} = post;
+    const data = {};
+    const postElement = $(`<div class="card m-1" style="width: 18rem;" >
                 <div class="card-body">
                     <h5 class="card-title">${title}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">Price: ${price}</h6>
                     <p class="card-text">${description}</p>
                     ${ token 
                         ? `<div class="card-body">
-                            ${ !isAuthor ? `<a href="#" class="card-link btn btn-primary btn-sm" role="button">Message</a>` : '' }
+                            ${ !isAuthor ? `<button type="button" class="card-link btn btn-outline-primary btn-sm" id="messageBtn">Message</button>` : '' }
                             ${ isAuthor 
-                                ? `<a href="#" class="card-link btn btn-secondary btn-sm" role="button">Edit</a>
-                                <a href="#" class="card-link btn btn-danger btn-sm" role="button">Delete</a>` 
+                                ? `<button type="button" class="card-link btn btn-outline-secondary btn-sm" id="editBtn">Edit</button>
+                                <button type="button" class="card-link btn btn-outline-danger btn-sm" id="deleteBtn">Delete</button>`
                                 : '' }
                         </div>`
                         : ''
                     }
                 </div>
             </div>
-    `
+    `).data('post', post);
 
     return postElement;
+}
+
+$(document).on('click', '#deleteBtn', async event => {
+    event.preventDefault();
+    const listingElement = $(event.target).closest('.card');
+    console.log(listingElement);
+    const data = listingElement.data();
+    console.log(data);
+    const { post: { _id } } = data;
+    console.log(_id);
+    console.log('clicked');
+
+    deleteListing(_id);
+    showHomePage();
+})
+
+// Delete Listing
+const deleteListing = async (postId) => {
+    const token = localStorage.getItem('token');
+    try{
+        const response = await fetch(`${BASE_URL}/posts/${postId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${JSON.parse(token)}`
+            }
+        });
+        const result = await response.json();
+        console.log(result);
+    } catch(err) {
+        console.error(err);
+        throw err;
+    }
 }
 
 // Template for reading messages on Account page
@@ -360,6 +416,9 @@ const getUserMessages = async () => {
     // }
 }
 
+
+
+
 const postListing = async (listingBody) => {
     const token = localStorage.getItem('token');
     try {
@@ -387,9 +446,13 @@ const showHomePage = () => {
         $('#loginNav').css('display', 'none');
         $('#logoutNav').show();
         $('#myAccountContainer').empty();
-        fetchPosts();
+        $('#postsContainer').empty();
+        $('body').removeClass('offcanvas-backdrop');
+        $('body').click();
         $('#homePageNav').addClass('active');
         $('#myAccountNav').removeClass('disabled').removeClass('active');
+        
+        fetchPosts();
     } else {
         $('#myAccountContainer').empty();
         $('#postsContainer').empty();
@@ -398,28 +461,7 @@ const showHomePage = () => {
     }
 }
 
-// Get user data
-const getUser = async () => {
-    const TOKEN_STRING = localStorage.getItem('token');
-    console.log(TOKEN_STRING);
-    try{
-        const response = await fetch(`${BASE_URL}/users/me`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${JSON.parse(TOKEN_STRING)}`
-            },
-        });
-        console.log(response);
-        const data = await response.json();
-        console.log(data);
-        return data;
-    } catch(err) {
-        console.error(err);
-    }
 
-
-}
 
 // Logout User
 const logoutUser = () => {
@@ -430,6 +472,7 @@ const logoutUser = () => {
     
     $('#myAccountNav').addClass('disabled').removeClass('active');
 }
+
 
 $('#logoutNav').on('click', () => {
     logoutUser();
