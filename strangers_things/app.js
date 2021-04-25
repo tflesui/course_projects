@@ -16,7 +16,6 @@ const getUser = async () => {
         });
         // console.log(response);
         const data = await response.json();
-        console.log(data);
         return data;
     } catch(err) {
         console.error(err);
@@ -53,9 +52,7 @@ const renderPosts = posts => {
 
 const createPostHTML = post => {
     const token = localStorage.getItem('token');
-    const {title, description, price, isAuthor, _id} = post;
-    console.log(post, isAuthor);
-    const data = {};
+    const {title, description, price, isAuthor} = post;
     const postElement = $(`<div class="card m-1" style="width: 18rem;" >
                 <div class="card-body">
                     <h5 class="card-title">${title}</h5>
@@ -262,8 +259,6 @@ $(document).on('click', '#messageBtn', async event => {
 
     localStorage.setItem('postId', JSON.stringify(_id));
 
-    console.log(_id);
-    console.log('clicked');
     }catch(err){
         console.error(err);
     }
@@ -305,7 +300,7 @@ const showMyAccount = async () => {
                         </div>
                         <div class="card-body">
                             <p class="card-text">See your messages to other users</p>
-                            <a  class="btn btn-primary" role="button" data-bs-toggle="offcanvas" href="#listingEntry" aria-controls="listingEntry">Sent Messages</a>
+                            <a  class="btn btn-primary" id="outboxBtn" role="button" data-bs-toggle="modal" href="#messages" aria-controls="messages">Sent Messages</a>
                         </div>
                     </div>                    
                     <div class="offcanvas offcanvas-start" tabindex="-1" id="listingEntry" aria-labelledby="listingEntryLabel">
@@ -408,20 +403,19 @@ const showMyAccount = async () => {
         $('#postsContainer').empty();
         showHomePage();
     });
-
+                        // Incoming Messages
     const getIncomingMessages = async () => {
         const data = await getUser();
         const { data: {messages} } = data;
-        const [ message ] = messages;
+        // const [ message ] = messages;
         // console.log(messages);
         // console.log(message);
-        return renderIncomingMessages(messages);
+            return renderIncomingMessages(messages);
     }
 
     // Template for reading messages on Account page
-    const showMessageHTML = message => {
-        
-        const  {fromUser:{ username }} = message;
+    const showInboxMessageHTML = message => {
+        const  {fromUser:{ username:sender }} = message;
         const {post: {title}} = message;
         const {content} = message;
 
@@ -433,26 +427,89 @@ const showMyAccount = async () => {
                                         <p class="card-text">${content}</p>
                                     </div>
                                     <div class="card-footer text-muted">
-                                        <p>From ${username}</p>
+                                        <p>From ${sender}</p>
                                     </div>
                                 </div>`
 
         return messageElement;
     }
 
-    const renderIncomingMessages = messages => {
-        $('.message-list').empty();
+    const renderIncomingMessages = async inboxMessages => {
+        try{
+            const data = await getUser();
+            const { data: {_id:myId} } = data;
+            const { data: {messages} } = data;
 
-        messages.forEach( card => {
-            const cardElement = showMessageHTML(card);
-            $('.message-list').append(cardElement);
-        });
+            $('.message-list').empty();
+    
+            inboxMessages.forEach( card => {
+                const { fromUser: {_id:senderId}} = card;
+                if(myId != senderId){
+                    const cardElement = showInboxMessageHTML(card);
+                    $('.message-list').append(cardElement);
+                }
+            });
+        }catch(err){
+            console.log(err);
+        }
     }
     
     $('#inboxBtn').on('click', () => {
         getIncomingMessages();
     })
     
+                        // Outgoing Messages
+    const getOutgoingMessages = async () => {
+        const data = await getUser();
+        const { data: {messages} } = data;
+        // const [ message ] = messages;
+        // console.log(messages);
+        // console.log(message);
+            return renderOutgoingMessages(messages);
+    }
+
+    // Template for reading messages on Account page
+    const showOutboxMessageHTML = message => {
+        // const  {fromUser:{ username:sender }} = message;
+        const {post: {title}} = message;
+        const {content} = message;
+
+        const messageElement = `<div class="card text-center mb-3">
+                                    <div class="card-header">                                        
+                                        <h5 class="card-title">Listing: ${title}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6>Message:</h6>
+                                        <p class="card-text">${content}</p>
+                                    </div>
+                                </div>`
+
+        return messageElement;
+    }
+
+    const renderOutgoingMessages = async outboxMessages => {
+        try{
+            const data = await getUser();
+            const { data: {_id:myId} } = data;
+            const { data: {messages} } = data;
+
+            $('.message-list').empty();
+    
+            outboxMessages.forEach( card => {
+                const { fromUser: {_id:senderId}} = card;
+                if(myId === senderId){
+                    const cardElement = showOutboxMessageHTML(card);
+                    $('.message-list').append(cardElement);
+                }
+            });
+        }catch(err){
+            console.log(err);
+        }
+    }
+    
+    $('#outboxBtn').on('click', () => {
+        getOutgoingMessages();
+    })
 }
 
 
@@ -531,4 +588,6 @@ $('#homePageNav').on('click', () => {
 });
 
 // fetchPosts();
-showHomePage();
+(async () => {
+    showHomePage();
+})();
