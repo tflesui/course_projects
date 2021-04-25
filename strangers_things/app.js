@@ -1,6 +1,28 @@
 const BASE_URL = 'https://strangers-things.herokuapp.com/api/2102-CPU-RM-WEB-PT';
 
+let POST_ID = '';
 
+// Get user data
+const getUser = async () => {
+    const TOKEN_STRING = localStorage.getItem('token');
+    // console.log(TOKEN_STRING);
+    try{
+        const response = await fetch(`${BASE_URL}/users/me`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${JSON.parse(TOKEN_STRING)}`
+            },
+        });
+        // console.log(response);
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch(err) {
+        console.error(err);
+    }
+
+}
 // Grab posts from API
 const fetchPosts = async () => {
     const token = localStorage.getItem('token');
@@ -21,38 +43,18 @@ const fetchPosts = async () => {
 }
 
 // Render all posts on page
-const renderPosts = (posts) => {
+const renderPosts = posts => {
     posts.forEach( post => {
         const postElement = createPostHTML(post);
         $('#postsContainer').append(postElement);
     });
 }
 
-// Get user data
-const getUser = async () => {
-    const TOKEN_STRING = localStorage.getItem('token');
-    console.log(TOKEN_STRING);
-    try{
-        const response = await fetch(`${BASE_URL}/users/me`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${JSON.parse(TOKEN_STRING)}`
-            },
-        });
-        console.log(response);
-        const data = await response.json();
-        console.log(data);
-        return data;
-    } catch(err) {
-        console.error(err);
-    }
-
-}
 
 const createPostHTML = post => {
     const token = localStorage.getItem('token');
     const {title, description, price, isAuthor, _id} = post;
+    console.log(post, isAuthor);
     const data = {};
     const postElement = $(`<div class="card m-1" style="width: 18rem;" >
                 <div class="card-body">
@@ -61,7 +63,7 @@ const createPostHTML = post => {
                     <p class="card-text">${description}</p>
                     ${ token 
                         ? `<div class="card-body">
-                            ${ !isAuthor ? `<button type="button" class="card-link btn btn-outline-primary btn-sm" id="messageBtn">Message</button>` : '' }
+                            ${ !isAuthor ? `<button type="button" class="card-link btn btn-outline-primary btn-sm" id="messageBtn" data-bs-toggle="modal" data-bs-target="#messageModal">Message</button>` : '' }
                             ${ isAuthor 
                                 ? `<button type="button" class="card-link btn btn-outline-secondary btn-sm" id="editBtn">Edit</button>
                                 <button type="button" class="card-link btn btn-outline-danger btn-sm" id="deleteBtn">Delete</button>`
@@ -76,19 +78,6 @@ const createPostHTML = post => {
     return postElement;
 }
 
-$(document).on('click', '#deleteBtn', async event => {
-    event.preventDefault();
-    const listingElement = $(event.target).closest('.card');
-    console.log(listingElement);
-    const data = listingElement.data();
-    console.log(data);
-    const { post: { _id } } = data;
-    console.log(_id);
-    console.log('clicked');
-
-    deleteListing(_id);
-    showHomePage();
-})
 
 // Delete Listing
 const deleteListing = async (postId) => {
@@ -109,26 +98,19 @@ const deleteListing = async (postId) => {
     }
 }
 
-// Template for reading messages on Account page
-const createMessageHTML = message => {
-    const {content, post, createdAt} = message;
+$(document).on('click', '#deleteBtn', async event => {
+    event.preventDefault();
+    const listingElement = $(event.target).closest('.card');
+    // console.log(listingElement);
+    const data = listingElement.data();
+    // console.log(data);
+    const { post: { _id } } = data;
+    // console.log(_id);
+    // console.log('clicked');
 
-    const messageElement = `<div class="card text-center">
-                                <div class="card-header">
-                                    Message for listing: ${post}
-                                </div>
-                                <div class="card-body">
-                                    <h5 class="card-title">Special title treatment</h5>
-                                    <p class="card-text">${content}</p>
-                                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                                </div>
-                                <div class="card-footer text-muted">
-                                    ${createdAt}
-                                </div>
-                            </div>`
-
-    return messageElement;
-}
+    deleteListing(_id);
+    showHomePage();
+})
 
 // Sign Up functionality
 const registerUser = async (username, password) => {
@@ -222,6 +204,71 @@ $('#loginModal form').on('submit', event => {
     $('#logoutNav').show();
 });
 
+// Send Message
+const sendMessage = async (messageBody, postId) => {
+    const url = `${BASE_URL}/posts/${postId}/messages`;
+    const token = localStorage.getItem('token');
+
+    try{
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${JSON.parse(token)}`
+            },
+            body: JSON.stringify({
+                message: {
+                    content: `${messageBody}`
+                }
+            })
+        });
+        console.log(response);
+        const { data: {message} } = await response.json();
+        console.log(message);
+        return message;
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+
+$('#messageModal form').on('submit', async event => {
+    event.preventDefault();
+
+    const postId = localStorage.getItem('postId')
+    const messageText = $('#messageBody').val();
+    try {
+    const result = await sendMessage(messageText, JSON.parse(postId));
+    console.log(result);
+    localStorage.removeItem('postId');
+    $('body').removeClass('modal-open');
+    $('.modal').css('display', 'none').attr('aria-hidden', 'true');
+    $('.modal-backdrop').removeClass('show').attr('aria-hidden', 'true').css('display', 'none');
+    $('#messageModal').removeClass('show');
+    $('form').trigger('reset');
+    showHomePage();
+    } catch(err) {
+        console.log(err);
+        throw err;
+    }
+})
+
+$(document).on('click', '#messageBtn', async event => {
+    event.preventDefault();
+    try{
+    const listingElement = $(event.target).closest('.card');
+    const data = listingElement.data();
+    const { post: { _id } } = data;
+
+    localStorage.setItem('postId', JSON.stringify(_id));
+
+    console.log(_id);
+    console.log('clicked');
+    }catch(err){
+        console.error(err);
+    }
+
+})
 
 // Display My Account
 const showMyAccount = async () => {
@@ -236,7 +283,6 @@ const showMyAccount = async () => {
         });
         const data = await response.json();
         const {data: {username}} = data;
-        getUserMessages();
         const accountPage = `
                     <h2 class="d-flex justify-content-end">Welcome, ${username}!</h2>
                     <div class="card mb-3 mt-3">
@@ -255,18 +301,13 @@ const showMyAccount = async () => {
                         </div>
                         <div class="card-body">
                             <p class="card-text">See what other users have to say to you</p>
-                            <a  class="btn btn-primary" role="button" data-bs-toggle="modal" href="#messages" aria-controls="messages">Show messages</a>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title d-flex justify-content-center">My Listings</h5>
+                            <a  class="btn btn-primary" id="inboxBtn" role="button" data-bs-toggle="modal" href="#messages" aria-controls="messages">Inbox</a>
                         </div>
                         <div class="card-body">
-                            <p class="card-text">See your posted listings.</p>
-                            <a  class="btn btn-primary" role="button" data-bs-toggle="offcanvas" href="#listingEntry" aria-controls="listingEntry">Show listings</a>
+                            <p class="card-text">See your messages to other users</p>
+                            <a  class="btn btn-primary" role="button" data-bs-toggle="offcanvas" href="#listingEntry" aria-controls="listingEntry">Sent Messages</a>
                         </div>
-                    </div>
+                    </div>                    
                     <div class="offcanvas offcanvas-start" tabindex="-1" id="listingEntry" aria-labelledby="listingEntryLabel">
                         <div class="offcanvas-header">
                             <h5 class="offcanvas-title" id="listingEntryLabel">Create a Listing</h5>
@@ -307,18 +348,19 @@ const showMyAccount = async () => {
                         </div>
                     </div>
                     <div class="modal fade" id="messages" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="messagesLabel">Message</h5>
+                                    <h5 class="modal-title" id="messagesLabel">Inbox</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                  <div class="modal-body">
-                                    <p>messages here</p>
+                                    <div class="message-list">
+                                        <p>messages here</p>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Understood</button>
                                 </div>
                             </div>
                         </div>
@@ -366,57 +408,52 @@ const showMyAccount = async () => {
         $('#postsContainer').empty();
         showHomePage();
     });
+
+    const getIncomingMessages = async () => {
+        const data = await getUser();
+        const { data: {messages} } = data;
+        const [ message ] = messages;
+        // console.log(messages);
+        // console.log(message);
+        return renderIncomingMessages(messages);
+    }
+
+    // Template for reading messages on Account page
+    const showMessageHTML = message => {
+        
+        const  {fromUser:{ username }} = message;
+        const {post: {title}} = message;
+        const {content} = message;
+
+        const messageElement = `<div class="card text-center mb-3">
+                                    <div class="card-header">                                        
+                                        <h5 class="card-title">Message for listing: ${title}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">${content}</p>
+                                    </div>
+                                    <div class="card-footer text-muted">
+                                        <p>From ${username}</p>
+                                    </div>
+                                </div>`
+
+        return messageElement;
+    }
+
+    const renderIncomingMessages = messages => {
+        $('.message-list').empty();
+
+        messages.forEach( card => {
+            const cardElement = showMessageHTML(card);
+            $('.message-list').append(cardElement);
+        });
+    }
+    
+    $('#inboxBtn').on('click', () => {
+        getIncomingMessages();
+    })
+    
 }
-
-const getUserMessages = async () => {
-    const {messages} = await getUser();
-
-    return messages;
-    // if(messages){
-    // messageElement = ` 
-    //         <div class="modal fade" id="messages" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    //             <div class="modal-dialog">
-    //                 <div class="modal-content">
-    //                     <div class="modal-header">
-    //                     <h5 class="modal-title" id="messagesLabel">Message</h5>
-    //                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    //                     </div>
-    //                     <div class="modal-body">
-    //                     ${ messages.forEach(message => {
-    //                         `<p>${message}</p>`
-    //                     })}
-    //                     </div>
-    //                     <div class="modal-footer">
-    //                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-    //                     <button type="button" class="btn btn-primary">Understood</button>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </div>
-    // `
-    // } else {
-    //     messageElement = ` 
-    //         <div class="modal fade" id="messages" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    //             <div class="modal-dialog">
-    //                 <div class="modal-content">
-    //                     <div class="modal-header">
-    //                     <h5 class="modal-title" id="messagesLabel">Message</h5>
-    //                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    //                     </div>
-    //                     <div class="modal-body">
-    //                     <p>No messages to display</p>
-    //                     </div>
-    //                     <div class="modal-footer">
-    //                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Done</button>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </div>
-    // `
-    // }
-}
-
-
 
 
 const postListing = async (listingBody) => {
@@ -440,6 +477,11 @@ const postListing = async (listingBody) => {
 
 const showHomePage = () => {
     const token = localStorage.getItem('token');
+    const postId = localStorage.getItem('postId');
+
+    if(postId){
+        localStorage.removeItem('postId');
+    }
 
     if(token) {
         $('#registerNav').css('display', 'none');
