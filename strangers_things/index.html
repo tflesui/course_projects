@@ -114,6 +114,64 @@
           </div>
         </div>
       </div>
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              ...
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Understood</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-center">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Edit Listing</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form novalidate>
+                <div class="mb-3 mt-4">
+                    <label for="listing-title" class="form-label">Listing Title</label>
+                    <input type="text" class="form-control" name="Title" id="edit-title">
+                </div>
+                <div class="input-group mb-3">
+                    <label for="listing-price" class="form-label"></label>
+                    <span class="input-group-text">$</span>
+                    <input type="text" class="form-control" id="edit-price" aria-label="Amount (to the nearest dollar)">
+                </div>
+                <div class="mb-3">
+                    <label for="listing-description" class="form-label">Description</label>
+                    <textarea class="form-control"  id="edit-description"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="listing-location" class="form-label">Location</label>
+                    <input type="text" class="form-control" name="Location" id="edit-location">
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" value="" id="editWillDeliver">
+                    <label class="form-check-label" for="willDeliver">
+                        Willing to deliver?
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+            <!-- <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Understood</button>
+            </div> -->
+          </div>
+        </div>
+      </div>
       <div class="modal fade" id="messageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-center">
           <div class="modal-content">

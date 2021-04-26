@@ -62,7 +62,8 @@ const createPostHTML = post => {
                         ? `<div class="card-body">
                             ${ !isAuthor ? `<button type="button" class="card-link btn btn-outline-primary btn-sm" id="messageBtn" data-bs-toggle="modal" data-bs-target="#messageModal">Message</button>` : '' }
                             ${ isAuthor 
-                                ? `<button type="button" class="card-link btn btn-outline-secondary btn-sm" id="editBtn">Edit</button>
+                                ? `                               <button type="button" class="card-link btn btn-outline-secondary btn-sm" id="editBtn" data-bs-toggle="modal" data-bs-target="#editModal">Edit
+                                </button>
                                 <button type="button" class="card-link btn btn-outline-danger btn-sm" id="deleteBtn">Delete</button>`
                                 : '' }
                         </div>`
@@ -75,6 +76,93 @@ const createPostHTML = post => {
     return postElement;
 }
 
+// Update Post
+const updatePost = async ( updatedPost, postId ) => {
+    const token = JSON.parse(localStorage.getItem('token'));
+    const url = `${BASE_URL}/posts/${postId}`;
+
+    try{
+        const response = await fetch(url, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedPost)
+        })
+        // console.log(response);
+        const result = await response.json();
+        // console.log(result);
+        return result;
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+$('#editModal form').on('submit', async event => {
+    event.preventDefault();
+    
+    const postId = localStorage.getItem('postId');
+    // console.log(postId);
+    let willDeliver = null;
+    $('#editWillDeliver').is(':checked')
+        ? willDeliver = true
+        : willDeliver = false;
+    const postData = {
+        post: {
+            title: $('#edit-title').val(),
+            price: $('#edit-price').val(),
+            description: $('#edit-description').val(),
+            location: $('#edit-location').val(),
+            willDeliver: willDeliver
+        }
+    }
+    try{
+        const result = await updatePost( postData, JSON.parse(postId));
+        // console.log(result);
+        localStorage.removeItem('postId');
+        $('body').removeClass('modal-open');
+        $('.modal').css('display', 'none').attr('aria-hidden', 'true');
+        $('.modal-backdrop').removeClass('show').attr('aria-hidden', 'true').css('display', 'none');
+        $('#editModal').removeClass('show');
+        $('form').trigger('reset');
+        $('body').click();
+        showHomePage();
+
+    }catch(err){
+        console.error(err);
+    }
+})
+
+$(document).on('click', '#editBtn', async event => {
+    event.preventDefault();
+    $('#editModal').show();
+    try{
+        const listingElement = $(event.target).closest('.card');
+        const data = listingElement.data();
+        // console.log(data)
+        const {post} = data;
+        // console.log(post)
+        const { title, price, description, location, willDeliver } = post;
+        const { post: { _id } } = data;
+
+        localStorage.setItem('postId', JSON.stringify(_id));
+
+        $('#edit-title').val(title);
+        $('#edit-price').val(price);
+        $('#edit-description').val(description);
+        $('#edit-location').val(location);
+        if(willDeliver){
+            $('#editWillDeliver').is(':checked');
+        }
+
+    // localStorage.setItem('postId', JSON.stringify(_id));
+
+    }catch(err){
+        console.error(err);
+    }
+
+})
 
 // Delete Listing
 const deleteListing = async (postId) => {
@@ -169,7 +257,7 @@ const loginUser = async (usernameValue, passwordValue) => {
             })
         });
         const { data: { token, message } } = await response.json();
-        console.log(token, message);
+        // console.log(token, message);
         // Store token in Local Storage
         localStorage.setItem("token", JSON.stringify(token));
         // Remove Sign Up link 
