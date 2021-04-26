@@ -62,7 +62,7 @@ const createPostHTML = post => {
                         ? `<div class="card-body">
                             ${ !isAuthor ? `<button type="button" class="card-link btn btn-outline-primary btn-sm" id="messageBtn" data-bs-toggle="modal" data-bs-target="#messageModal">Message</button>` : '' }
                             ${ isAuthor 
-                                ? `                               <button type="button" class="card-link btn btn-outline-secondary btn-sm" id="editBtn" data-bs-toggle="modal" data-bs-target="#editModal">Edit
+                                ? `<button type="button" class="card-link btn btn-outline-secondary btn-sm" id="editBtn" data-bs-toggle="modal" data-bs-target="#editModal">Edit
                                 </button>
                                 <button type="button" class="card-link btn btn-outline-danger btn-sm" id="deleteBtn">Delete</button>`
                                 : '' }
@@ -78,7 +78,7 @@ const createPostHTML = post => {
 
 // Update Post
 const updatePost = async ( updatedPost, postId ) => {
-    const token = JSON.parse(localStorage.getItem('token'));
+    const token = localStorage.getItem('token');
     const url = `${BASE_URL}/posts/${postId}`;
 
     try{
@@ -86,7 +86,7 @@ const updatePost = async ( updatedPost, postId ) => {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${JSON.parse(token)}`
             },
             body: JSON.stringify(updatedPost)
         })
@@ -99,7 +99,7 @@ const updatePost = async ( updatedPost, postId ) => {
     }
 }
 
-$('#editModal form').on('submit', async event => {
+$('#editModal').on('submit', async event => {
     event.preventDefault();
     
     const postId = localStorage.getItem('postId');
@@ -119,7 +119,7 @@ $('#editModal form').on('submit', async event => {
     }
     try{
         const result = await updatePost( postData, JSON.parse(postId));
-        // console.log(result);
+        console.log(result);
         localStorage.removeItem('postId');
         $('body').removeClass('modal-open');
         $('.modal').css('display', 'none').attr('aria-hidden', 'true');
@@ -155,8 +155,6 @@ $(document).on('click', '#editBtn', async event => {
         if(willDeliver){
             $('#editWillDeliver').is(':checked');
         }
-
-    // localStorage.setItem('postId', JSON.stringify(_id));
 
     }catch(err){
         console.error(err);
@@ -317,7 +315,7 @@ const sendMessage = async (messageBody, postId) => {
 }
 
 
-$('#messageModal form').on('submit', async event => {
+$('#messageModal').on('submit', async event => {
     event.preventDefault();
 
     const postId = localStorage.getItem('postId')
@@ -325,6 +323,7 @@ $('#messageModal form').on('submit', async event => {
     try {
     const result = await sendMessage(messageText, JSON.parse(postId));
     console.log(result);
+    console.log('submitted message form');
     localStorage.removeItem('postId');
     $('body').removeClass('modal-open');
     $('.modal').css('display', 'none').attr('aria-hidden', 'true');
@@ -340,12 +339,13 @@ $('#messageModal form').on('submit', async event => {
 
 $(document).on('click', '#messageBtn', async event => {
     event.preventDefault();
+    console.log('clicked message');
     try{
-    const listingElement = $(event.target).closest('.card');
-    const data = listingElement.data();
-    const { post: { _id } } = data;
+        const listingElement = $(event.target).closest('.card');
+        const data = listingElement.data();
+        const { post: { _id } } = data;
 
-    localStorage.setItem('postId', JSON.stringify(_id));
+        localStorage.setItem('postId', JSON.stringify(_id));
 
     }catch(err){
         console.error(err);
@@ -434,7 +434,7 @@ const showMyAccount = async () => {
                         <div class="modal-dialog modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="messagesLabel">Inbox</h5>
+                                    <h5 class="modal-title" id="messagesLabel">Your Messages</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                  <div class="modal-body">
@@ -507,6 +507,7 @@ const showMyAccount = async () => {
         const {post: {title}} = message;
         const {content} = message;
 
+
         const messageElement = `<div class="card text-center mb-3">
                                     <div class="card-header">                                        
                                         <h5 class="card-title">Message for listing: ${title}</h5>
@@ -525,10 +526,17 @@ const showMyAccount = async () => {
     const renderIncomingMessages = async inboxMessages => {
         try{
             const data = await getUser();
+            // console.log(data);
             const { data: {_id:myId} } = data;
             const { data: {messages} } = data;
-
+            // console.log(messages)
             $('.message-list').empty();
+
+            if(messages.length === 0){
+                $('.message-list').append(`
+                    <h5>No messages to display</h5>
+                `);
+            }
     
             inboxMessages.forEach( card => {
                 const { fromUser: {_id:senderId}} = card;
@@ -582,6 +590,12 @@ const showMyAccount = async () => {
             const { data: {messages} } = data;
 
             $('.message-list').empty();
+
+            if(messages.length === 0){
+                $('.message-list').append(`
+                    <h5>No messages to display</h5>
+                `);
+            }
     
             outboxMessages.forEach( card => {
                 const { fromUser: {_id:senderId}} = card;
