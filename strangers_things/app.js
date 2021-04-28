@@ -315,7 +315,7 @@ const sendMessage = async (messageBody, postId) => {
 }
 
 
-$('#messageModal').on('submit', async event => {
+$('#messageModal form').on('submit', async event => {
     event.preventDefault();
 
     const postId = localStorage.getItem('postId')
