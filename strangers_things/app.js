@@ -184,12 +184,8 @@ const deleteListing = async (postId) => {
 $(document).on('click', '#deleteBtn', async event => {
     event.preventDefault();
     const listingElement = $(event.target).closest('.card');
-    // console.log(listingElement);
     const data = listingElement.data();
-    // console.log(data);
     const { post: { _id } } = data;
-    // console.log(_id);
-    // console.log('clicked');
 
     deleteListing(_id);
     showHomePage();
@@ -218,7 +214,6 @@ const registerUser = async (username, password) => {
         // Store token in Local Storage
         localStorage.setItem("token", JSON.stringify(token));
 
-        // hideRegistration();
     } catch (error) {
         console.error(error);
     }
@@ -255,7 +250,6 @@ const loginUser = async (usernameValue, passwordValue) => {
             })
         });
         const { data: { token, message } } = await response.json();
-        // console.log(token, message);
         // Store token in Local Storage
         localStorage.setItem("token", JSON.stringify(token));
         // Remove Sign Up link 
@@ -491,13 +485,10 @@ const showMyAccount = async () => {
         $('#postsContainer').empty();
         showHomePage();
     });
-                        // Incoming Messages
+    // Incoming Messages
     const getIncomingMessages = async () => {
         const data = await getUser();
         const { data: {messages} } = data;
-        // const [ message ] = messages;
-        // console.log(messages);
-        // console.log(message);
             return renderIncomingMessages(messages);
     }
 
@@ -526,10 +517,8 @@ const showMyAccount = async () => {
     const renderIncomingMessages = async inboxMessages => {
         try{
             const data = await getUser();
-            // console.log(data);
             const { data: {_id:myId} } = data;
             const { data: {messages} } = data;
-            // console.log(messages)
             $('.message-list').empty();
 
             if(messages.length === 0){
@@ -554,19 +543,16 @@ const showMyAccount = async () => {
         getIncomingMessages();
     })
     
-                        // Outgoing Messages
+    // Outgoing Messages
     const getOutgoingMessages = async () => {
         const data = await getUser();
         const { data: {messages} } = data;
-        // const [ message ] = messages;
-        // console.log(messages);
-        // console.log(message);
-            return renderOutgoingMessages(messages);
+
+        return renderOutgoingMessages(messages);
     }
 
     // Template for reading messages on Account page
     const showOutboxMessageHTML = message => {
-        // const  {fromUser:{ username:sender }} = message;
         const {post: {title}} = message;
         const {content} = message;
 
@@ -614,7 +600,7 @@ const showMyAccount = async () => {
     })
 }
 
-
+// Create a new listing
 const postListing = async (listingBody) => {
     const token = localStorage.getItem('token');
     try {
@@ -634,6 +620,7 @@ const postListing = async (listingBody) => {
     }
 }
 
+// Render home page
 const showHomePage = () => {
     const token = localStorage.getItem('token');
     const postId = localStorage.getItem('postId');
